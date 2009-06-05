@@ -1,6 +1,48 @@
 = state_pattern
 
-Description goes here.
+A Ruby state pattern implementation.
+The idea comes from this nice Jay Field's post http://blog.jayfields.com/2007/08/ruby-state-pattern-using-modules-and.html
+
+  module James
+    protected
+  
+    def name
+      transition_to(Lynn)
+      "James #{last_name}"
+    end
+  end
+  
+  module Lynn
+    protected
+  
+    def name
+      transition_to(James)
+      "Lynn #{last_name}"
+    end
+  end
+  
+  class FamilyMember
+    include StatePattern
+    add_states James, Lynn
+    set_initial_state Lynn
+  
+    def name
+      state_instance.name
+    end
+  
+    def last_name
+      "Holbrook"
+    end
+  end
+
+  member = FamilyMember.new
+  puts member.name # => "Lynn Holbrook"
+  puts member.name # => "James Holbrook"
+  puts member.name # => "Lynn Holbrook"
+
+== Requirements
+
+facets
 
 == Copyright
 

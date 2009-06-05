@@ -5,7 +5,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "state_pattern"
-    gem.summary = %Q{TODO}
+    gem.summary = %Q{A Ruby state pattern implementation}
     gem.email = "dcadenas@gmail.com"
     gem.homepage = "http://github.com/dcadenas/state_pattern"
     gem.authors = ["Daniel Cadenas"]
