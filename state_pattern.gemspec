@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/state_pattern.rb",
+     "state_pattern.gemspec",
      "test/state_pattern_test.rb",
      "test/test_helper.rb"
   ]
