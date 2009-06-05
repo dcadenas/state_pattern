@@ -1,0 +1,7 @@
+= state_pattern
+
+Description goes here.
+
+== Copyright
+
+Copyright (c) 2009 Daniel Cadenas. See LICENSE for details.
