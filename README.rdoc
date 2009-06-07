@@ -3,42 +3,45 @@
 A Ruby state pattern implementation.
 The idea comes from this nice Jay Field's post http://blog.jayfields.com/2007/08/ruby-state-pattern-using-modules-and.html
 
-  module James
+  require 'rubygems'
+  require 'state_pattern'
+
+  module On
     protected
   
-    def name
-      transition_to(Lynn)
-      "James #{last_name}"
+    def press
+      transition_to(Off)
+      "#{button_name} is off"
     end
   end
   
-  module Lynn
+  module Off
     protected
   
-    def name
-      transition_to(James)
-      "Lynn #{last_name}"
+    def press
+      transition_to(On)
+      "#{button_name} is on"
     end
   end
   
-  class FamilyMember
+  class Button
     include StatePattern
-    add_states James, Lynn
-    set_initial_state Lynn
+    add_states On, Off
+    set_initial_state Off
   
-    def name
-      state_instance.name
+    def press
+      state_instance.press
     end
   
-    def last_name
-      "Holbrook"
+    def button_name
+      "Light button"
     end
   end
 
-  member = FamilyMember.new
-  puts member.name # => "Lynn Holbrook"
-  puts member.name # => "James Holbrook"
-  puts member.name # => "Lynn Holbrook"
+  button = Button.new
+  puts button.press # => "Light button if on"
+  puts button.press # => "Light button if off"
+  puts button.press # => "Light button if on"
 
 == Requirements
 
