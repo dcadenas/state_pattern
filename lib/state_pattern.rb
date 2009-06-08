@@ -48,28 +48,15 @@ module StatePattern
     end
   end
 
-  attr_accessor :current_state, :current_event, :states
+  attr_accessor :current_state, :current_event
   def initialize(*args)
     super(*args)
-    self.states = {}
-    add_state_instances
     set_state(self.class.initial_state_class)
     self.class.delegate_all_state_events
   end
 
   def set_state(state_class)
-    add_state_instance(state_class)
-    self.current_state = self.states[state_class]
-  end
-
-  def add_state_instances
-    self.class.state_classes.map do |state_class|
-      add_state_instance(state_class)
-    end
-  end
-  
-  def add_state_instance(state_class)
-    self.states[state_class] = state_class.new(self) if !self.states.has_key?(state_class) || self.states[state_class].nil?
+    self.current_state = state_class.new(self)
   end
 
   def delegate_to_event(method_name, *args)
