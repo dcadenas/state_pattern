@@ -2,26 +2,20 @@
 
 A Ruby state pattern implementation.
 
-The idea comes from this nice Jay Field's post http://blog.jayfields.com/2007/08/ruby-state-pattern-using-modules-and.html
-
   require 'rubygems'
   require 'state_pattern'
 
-  module On
-    protected
-  
+  class On < StatePattern::State
     def press
       transition_to(Off)
-      "#{button_name} is off"
+      "#{stateable.button_name} is off"
     end
   end
   
-  module Off
-    protected
-  
+  class Off < StatePattern::State
     def press
       transition_to(On)
-      "#{button_name} is on"
+      "#{stateable.button_name} is on"
     end
   end
   
@@ -62,10 +56,6 @@ With more than one target state
 
 Using event names to gain more detail
   valid_transitions [Up, :switch] => [Middle, Down], [Down, :switch] => Middle, [Middle, :switch] => Up 
-
-== Requirements
-
-facets
 
 == Copyright
 

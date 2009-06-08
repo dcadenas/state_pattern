@@ -1,35 +1,29 @@
-require 'facets'
+require 'state_pattern/state'
+require 'state_pattern/invalid_transition_exception'
 
 module StatePattern
-  class InvalidTransitionException < RuntimeError
-    attr_reader :from_module, :to_module, :event
-    def initialize(from_module, to_module, event)
-      @from_module = from_module
-      @to_module = to_module
-      @event = event
-    end
-
-    def message
-      "Event #@event cannot transition from #@from_module to #@to_module"
-    end
-  end
-
   def self.included(base)
     base.instance_eval do
-      def initial_state
-        @initial_state
+      def state_classes
+        @state_classes ||= []
       end
 
-      def set_initial_state(state_module)
-        @initial_state = state_module
+      def initial_state_class
+        @initial_state_class
       end
 
-      def add_states(*state_modules)
-        @state_modules = state_modules
-        @state_modules.each do |state_module|
-          include state_module
+      def set_initial_state(state_class)
+        @initial_state_class = state_class
+      end
+
+      def add_states(*state_classes)
+        state_classes.each do |state_class|
+          add_state_class(state_class)
         end
-        delegate_all_events
+      end
+
+      def add_state_class(state_class)
+        state_classes << state_class
       end
 
       def valid_transitions(transitions_hash)
@@ -40,33 +34,52 @@ module StatePattern
         @transitions_hash
       end
 
-      def delegate_all_events
-        state_methods.each do |method_name|
-          define_method method_name do |*args|
-            delegate_to_event(method_name, *args)
+      def delegate_all_state_events
+        state_methods.each do |state_method|
+          define_method state_method do |*args|
+            delegate_to_event(state_method)
           end
         end
       end
 
       def state_methods
-        @state_modules.map{|state_module| state_module.__send__(:instance_methods)}.flatten.uniq
+        state_classes.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq
       end
     end
   end
 
-  attr_accessor :current_state_module, :current_event
+  attr_accessor :current_state, :current_event, :states
   def initialize(*args)
     super(*args)
-    self.current_state_module = self.class.initial_state
+    self.states = {}
+    add_state_instances
+    set_state(self.class.initial_state_class)
+    self.class.delegate_all_state_events
   end
 
-  def current_state_instance
-    as(current_state_module)
+  def set_state(state_class)
+    add_state_instance(state_class)
+    self.current_state = self.states[state_class]
   end
 
-  def transition_to(state_module)
-    raise InvalidTransitionException.new(self.current_state_module, state_module, self.current_event) unless self.valid_transition?(self.current_state_module, state_module)
-    self.current_state_module = state_module
+  def add_state_instances
+    self.class.state_classes.map do |state_class|
+      add_state_instance(state_class)
+    end
+  end
+  
+  def add_state_instance(state_class)
+    self.states[state_class] = state_class.new(self) if !self.states.has_key?(state_class) || self.states[state_class].nil?
+  end
+
+  def delegate_to_event(method_name, *args)
+    self.current_event = method_name.to_sym
+    self.current_state.send(current_event, *args)
+  end
+
+  def transition_to(state_class)
+    raise InvalidTransitionException.new(self.current_state.class, state_class, self.current_event) unless self.valid_transition?(self.current_state.class, state_class)
+    set_state(state_class)
   end
 
   def valid_transition?(from_module, to_module)
@@ -82,12 +95,7 @@ module StatePattern
   end
 
   def state
-    self.current_state_module.to_s
-  end
-
-  def delegate_to_event(method_name, *args)
-    self.current_event = method_name.to_sym
-    self.current_state_instance.__send__(current_event, *args)
+    self.current_state.state
   end
 end
 

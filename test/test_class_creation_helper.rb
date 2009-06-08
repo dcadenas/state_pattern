@@ -1,4 +1,5 @@
 module TestClassCreationHelper
+  #TODO: ugly
   def with_test_class(main_state_module_name, options = {})
     created_consts = []
     transitions = options[:transitions] || {}
@@ -6,7 +7,7 @@ module TestClassCreationHelper
 
     if options.has_key?(:states)
       options[:states].each do |state_name|
-        created_consts << create_module(state_name) do
+        created_consts << create_class(state_name, StatePattern::State) do
           state_methods.each do |method_name|
             define_method method_name do
               next_state_name = transitions[[state_name, method_name]]
@@ -47,12 +48,12 @@ module TestClassCreationHelper
 
 private
 
-  def create_module(module_name, module_or_class = Module, &block)
-    new_module = module_or_class.new &block
+  def create_module(module_name, superklass = Object, module_or_class = Module, &block)
+    new_module = module_or_class.new(superklass, &block)
     Object.const_set(module_name, new_module) unless Object.const_defined? module_name
   end
 
-  def create_class(class_name, &block)
-    create_module(class_name, Class, &block)
+  def create_class(class_name, superklass = Object, &block)
+    create_module(class_name, superklass, Class, &block)
   end
 end

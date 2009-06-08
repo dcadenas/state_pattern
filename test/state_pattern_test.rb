@@ -1,19 +1,17 @@
 require 'test_helper'
 
 module Family
-  module James
-    protected
+  class James < StatePattern::State
     def name
       transition_to(Lynn)
-      "James #{last_name}"
+      "James #{stateable.last_name}"
     end
   end
 
-  module Lynn
-    protected
+  class Lynn < StatePattern::State
     def name
       transition_to(James)
-      "Lynn #{last_name}"
+      "Lynn #{stateable.last_name}"
     end
   end
 
