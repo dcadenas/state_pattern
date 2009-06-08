@@ -1,6 +1,7 @@
 = state_pattern
 
 A Ruby state pattern implementation.
+
 The idea comes from this nice Jay Field's post http://blog.jayfields.com/2007/08/ruby-state-pattern-using-modules-and.html
 
   require 'rubygems'
@@ -52,6 +53,7 @@ One of the few drawbacks the state pattern has is that it can get difficult to s
 To deal with this problem you have the option of using the valid_transitions statement to "draw" your state diagram in code. Whenever a state transition is performed, the valid_transitions hash is checked and if the transition is not valid a StatePattern::InvalidTransitionException is thrown.
 
 Examples:
+
 The most basic notation
   valid_transitions On => Off, Off => On
 
