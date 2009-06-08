@@ -41,6 +41,9 @@ A Ruby state pattern implementation.
   puts button.press # => "Light button is off"
   puts button.press # => "Light button is on"
 
+== Instalation
+  sudo gem install state_pattern
+
 == Validations
 
 One of the few drawbacks the state pattern has is that it can get difficult to see the global picture of your state machine when dealing with complex cases.
@@ -56,6 +59,10 @@ With more than one target state
 
 Using event names to gain more detail
   valid_transitions [Up, :switch] => [Middle, Down], [Down, :switch] => Middle, [Middle, :switch] => Up 
+
+== Colaborate
+
+http://github.com/dcadenas/state_pattern
 
 == Copyright
 
