@@ -52,12 +52,13 @@ One of the few drawbacks the state pattern has is that it can get difficult to s
 To deal with this problem you have the option of using the valid_transitions statement to "draw" your state diagram in code. Whenever a state transition is performed, the valid_transitions hash is checked and if the transition is not valid a StatePattern::InvalidTransitionException is thrown.
 
 Examples:
-  #this is the most basic notation
+The most basic notation
   valid_transitions On => Off, Off => On
 
+With more than one target state
   valid_transitions Up => [Middle, Down], Down => Middle, Middle => Up 
 
-  #but you can use event names too
+Using event names to gain more detail
   valid_transitions [Up, :switch] => [Middle, Down], [Down, :switch] => Middle, [Middle, :switch] => Up 
 
 == Requirements
