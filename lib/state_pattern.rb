@@ -8,7 +8,18 @@ module StatePattern
 
   module ClassMethods
     def state_classes
-      @state_classes ||= []
+      state_classes_in_transisions_hash = []
+
+      if transitions_hash
+        state_classes_in_transisions_hash = transitions_hash.map do |from, to|
+          from_class = from.respond_to?(:to_ary) ? from.first : from
+          to_classes = to.respond_to?(:to_ary) ? to : [to]
+          to_classes + [from_class]
+        end.flatten
+      end
+
+      state_classes_in_transisions_hash << initial_state_class
+      state_classes_in_transisions_hash.uniq
     end
 
     def initial_state_class
@@ -17,16 +28,6 @@ module StatePattern
 
     def set_initial_state(state_class)
       @initial_state_class = state_class
-    end
-
-    def add_states(*state_classes)
-      state_classes.each do |state_class|
-        add_state_class(state_class)
-      end
-    end
-
-    def add_state_class(state_class)
-      state_classes << state_class
     end
 
     def valid_transitions(transitions_hash)

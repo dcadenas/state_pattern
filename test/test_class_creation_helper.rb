@@ -22,7 +22,6 @@ module TestClassCreationHelper
 
     created_consts << create_class(main_state_module_name) do
       include StatePattern
-      add_states *options[:states].map{|s| Object.const_get(s)} if options.has_key?(:states)
       set_initial_state Object.const_get(options[:initial_state]) if options.has_key?(:initial_state)
       if options.has_key?(:valid_transitions)
         valid_transitions_with_constants = {}

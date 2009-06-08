@@ -21,15 +21,8 @@ A Ruby state pattern implementation.
   
   class Button
     include StatePattern
-    add_states On, Off
     set_initial_state Off
     valid_transitions [On, :press] => Off, [Off, :press] => On
-
-    #this method can be removed as it will be mapped automatically anyways
-    #but it is good to leave the option to do the delegation yourself in case you want more freedom
-    def press
-      delegate_to_event(:press)
-    end
   
     def button_name
       "Light button"

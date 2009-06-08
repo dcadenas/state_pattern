@@ -17,7 +17,6 @@ module Family
 
   class Member
     include StatePattern
-    add_states James, Lynn
     set_initial_state Lynn
     valid_transitions [James, :name] => Lynn, [Lynn, :name] => James
 
