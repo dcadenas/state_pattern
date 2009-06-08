@@ -31,7 +31,7 @@ The idea comes from this nice Jay Field's post http://blog.jayfields.com/2007/08
     valid_transitions [On, :press] => Off, [Off, :press] => On
 
     #this method can be removed as it will be mapped automatically anyways
-    #but is good to leave the option to do the delegation yourself in case you want to do more things
+    #but it is good to leave the option to do the delegation yourself in case you want more freedom
     def press
       delegate_to_event(:press)
     end
@@ -45,6 +45,20 @@ The idea comes from this nice Jay Field's post http://blog.jayfields.com/2007/08
   puts button.press # => "Light button is on"
   puts button.press # => "Light button is off"
   puts button.press # => "Light button is on"
+
+== Validations
+
+One of the few drawbacks the state pattern has is that it can get difficult to see the global picture of your state machine when dealing with complex cases.
+To deal with this problem you have the option of using the valid_transitions statement to "draw" your state diagram in code. Whenever a state transition is performed, the valid_transitions hash is checked and if the transition is not valid a StatePattern::InvalidTransitionException is thrown.
+
+Examples:
+  #this is the most basic notation
+  valid_transitions On => Off, Off => On
+
+  valid_transitions Up => [Middle, Down], Down => Middle, Middle => Up 
+
+  #but you can use event names too
+  valid_transitions [Up, :switch] => [Middle, Down], [Down, :switch] => Middle, [Middle, :switch] => Up 
 
 == Requirements
 
