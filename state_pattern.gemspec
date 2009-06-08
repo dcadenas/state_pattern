@@ -3,9 +3,10 @@
 Gem::Specification.new do |s|
   s.name = %q{state_pattern}
   s.version = "0.1.0"
+
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Daniel Cadenas"]
-  s.date = %q{2009-06-05}
+  s.date = %q{2009-06-07}
   s.email = %q{dcadenas@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -21,7 +22,9 @@ Gem::Specification.new do |s|
      "lib/state_pattern.rb",
      "state_pattern.gemspec",
      "test/state_pattern_test.rb",
-     "test/test_helper.rb"
+     "test/test_class_creation_helper.rb",
+     "test/test_helper.rb",
+     "test/transition_validations_test.rb"
   ]
   s.homepage = %q{http://github.com/dcadenas/state_pattern}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -30,7 +33,9 @@ Gem::Specification.new do |s|
   s.summary = %q{A Ruby state pattern implementation}
   s.test_files = [
     "test/state_pattern_test.rb",
-     "test/test_helper.rb"
+     "test/test_class_creation_helper.rb",
+     "test/test_helper.rb",
+     "test/transition_validations_test.rb"
   ]
 
   if s.respond_to? :specification_version then
