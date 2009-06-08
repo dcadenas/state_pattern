@@ -41,7 +41,7 @@ A Ruby state pattern implementation.
   puts button.press # => "Light button is off"
   puts button.press # => "Light button is on"
 
-== Instalation
+== Installation
   sudo gem install state_pattern
 
 == Validations
