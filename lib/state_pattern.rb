@@ -64,7 +64,7 @@ module StatePattern
   end
 
   def set_state(state_class)
-    self.current_state = state_class.new(self)
+    self.current_state = state_class.new(self, self.current_state)
   end
 
   def delegate_to_event(method_name, *args)
