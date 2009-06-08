@@ -28,9 +28,12 @@ The idea comes from this nice Jay Field's post http://blog.jayfields.com/2007/08
     include StatePattern
     add_states On, Off
     set_initial_state Off
-  
+    valid_transitions [On, :press] => Off, [Off, :press] => On
+
+    #this method can be removed as it will be mapped automatically anyways
+    #but is good to leave the option to do the delegation yourself in case you want to do more things
     def press
-      state_instance.press
+      delegate_to_event(:press)
     end
   
     def button_name
@@ -39,9 +42,9 @@ The idea comes from this nice Jay Field's post http://blog.jayfields.com/2007/08
   end
 
   button = Button.new
-  puts button.press # => "Light button if on"
-  puts button.press # => "Light button if off"
-  puts button.press # => "Light button if on"
+  puts button.press # => "Light button is on"
+  puts button.press # => "Light button is off"
+  puts button.press # => "Light button is on"
 
 == Requirements
 

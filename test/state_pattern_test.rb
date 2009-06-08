@@ -3,7 +3,6 @@ require 'test_helper'
 module Family
   module James
     protected
-
     def name
       transition_to(Lynn)
       "James #{last_name}"
@@ -12,7 +11,6 @@ module Family
 
   module Lynn
     protected
-
     def name
       transition_to(James)
       "Lynn #{last_name}"
@@ -23,39 +21,15 @@ module Family
     include StatePattern
     add_states James, Lynn
     set_initial_state Lynn
+    valid_transitions [James, :name] => Lynn, [Lynn, :name] => James
 
+    #notice this method is optional, it will be delegated automatically if removed
     def name
-      state_instance.name
+      delegate_to_event :name
     end
 
     def last_name
       "Holbrook"
-    end
-  end
-end
-
-module Button
-  module On
-    def press
-      transition_to Off
-      "off"
-    end
-  end
-
-  module Off
-    def press
-      transition_to On
-      "on"
-    end
-  end
-
-  class Button
-    include StatePattern
-    add_states On, Off
-    set_initial_state Off
-
-    def press
-      state_instance.press
     end
   end
 end
@@ -79,10 +53,41 @@ Expectations do
     member.name 
   end
 
-  expect ["Lynn Holbrook", "on", "James Holbrook", "off"] do
-    button = Button::Button.new
-    member = Family::Member.new
-    [member.name, button.press, member.name, button.press]
+  expect "on" do
+    with_test_class("Button", :states => ["On", "Off"], :initial_state => "Off",
+                    :transitions => {["On", :press] => "Off", ["Off", :press] => "On"}) do
+      button = Button.new
+      button.press
+    end
+  end
+
+  expect "off" do
+    with_test_class("Button", :states => ["On", "Off"], :initial_state => "Off",
+                    :transitions => {["On", :press] => "Off", ["Off", :press] => "On"}) do
+      button = Button.new
+      button.press
+      button.press
+    end
+  end
+
+  expect "on" do
+    with_test_class("Button", :states => ["On", "Off"], :initial_state => "Off",
+                    :transitions => {["On", :press] => "Off", ["Off", :press] => "On"}) do
+      button = Button.new
+      button.press
+      button.press
+      button.press
+    end
+  end
+
+  expect "on" do
+    with_test_class("Button", :states => ["On", "Off"], :initial_state => "Off",
+                    :transitions => {["On", :press] => "Off", ["Off", :press] => "On"}) do
+      button1 = Button.new
+      button2 = Button.new
+      button1.press
+      button2.press
+    end
   end
 end
 
