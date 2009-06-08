@@ -2,14 +2,15 @@ require 'facets'
 
 module StatePattern
   class InvalidTransitionException < RuntimeError
-    attr_reader :from_module, :to_module
-    def initialize(from_module, to_module)
+    attr_reader :from_module, :to_module, :event
+    def initialize(from_module, to_module, event)
       @from_module = from_module
       @to_module = to_module
+      @event = event
     end
 
     def message
-      "Cannot transition from #{@from_module} to #{@to_module}"
+      "Event #@event cannot transition from #@from_module to #@to_module"
     end
   end
 
@@ -64,7 +65,7 @@ module StatePattern
   end
 
   def transition_to(state_module)
-    raise InvalidTransitionException.new(self.current_state_module, state_module) unless self.valid_transition?(self.current_state_module, state_module)
+    raise InvalidTransitionException.new(self.current_state_module, state_module, self.current_event) unless self.valid_transition?(self.current_state_module, state_module)
     self.current_state_module = state_module
   end
 
