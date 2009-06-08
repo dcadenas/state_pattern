@@ -60,7 +60,7 @@ With more than one target state
 Using event names to gain more detail
   valid_transitions [Up, :switch] => [Middle, Down], [Down, :switch] => Middle, [Middle, :switch] => Up 
 
-== Colaborate
+== Collaborate
 
 http://github.com/dcadenas/state_pattern
 
