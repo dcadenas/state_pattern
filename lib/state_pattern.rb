@@ -3,48 +3,50 @@ require 'state_pattern/invalid_transition_exception'
 
 module StatePattern
   def self.included(base)
-    base.instance_eval do
-      def state_classes
-        @state_classes ||= []
-      end
+    base.extend ClassMethods
+  end
 
-      def initial_state_class
-        @initial_state_class
-      end
+  module ClassMethods
+    def state_classes
+      @state_classes ||= []
+    end
 
-      def set_initial_state(state_class)
-        @initial_state_class = state_class
-      end
+    def initial_state_class
+      @initial_state_class
+    end
 
-      def add_states(*state_classes)
-        state_classes.each do |state_class|
-          add_state_class(state_class)
+    def set_initial_state(state_class)
+      @initial_state_class = state_class
+    end
+
+    def add_states(*state_classes)
+      state_classes.each do |state_class|
+        add_state_class(state_class)
+      end
+    end
+
+    def add_state_class(state_class)
+      state_classes << state_class
+    end
+
+    def valid_transitions(transitions_hash)
+      @transitions_hash = transitions_hash
+    end
+
+    def transitions_hash
+      @transitions_hash
+    end
+
+    def delegate_all_state_events
+      state_methods.each do |state_method|
+        define_method state_method do |*args|
+          delegate_to_event(state_method)
         end
       end
+    end
 
-      def add_state_class(state_class)
-        state_classes << state_class
-      end
-
-      def valid_transitions(transitions_hash)
-        @transitions_hash = transitions_hash
-      end
-
-      def transitions_hash
-        @transitions_hash
-      end
-
-      def delegate_all_state_events
-        state_methods.each do |state_method|
-          define_method state_method do |*args|
-            delegate_to_event(state_method)
-          end
-        end
-      end
-
-      def state_methods
-        state_classes.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq
-      end
+    def state_methods
+      state_classes.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq
     end
   end
 
@@ -72,13 +74,13 @@ module StatePattern
   def valid_transition?(from_module, to_module)
     trans = self.class.transitions_hash
     return true if trans.nil?
-    
+
     #TODO: ugly
     trans.has_key?(from_module) &&
       (trans[from_module] == to_module ||
        trans[from_module].include?(to_module)) ||
-     trans.has_key?([from_module, current_event]) &&
-     (trans[[from_module, current_event]] == to_module || trans[[from_module, current_event]].include?(to_module))
+       trans.has_key?([from_module, current_event]) &&
+       (trans[[from_module, current_event]] == to_module || trans[[from_module, current_event]].include?(to_module))
   end
 
   def state
