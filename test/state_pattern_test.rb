@@ -87,6 +87,16 @@ Expectations do
       button2.press
     end
   end
+
+  expect ["ping", "on", "pong", "off"] do
+    with_test_class("PingPong", :states => ["Ping", "Pong"], :initial_state => "Pong", :transitions => {["Ping", :do_it] => "Pong", ["Pong", :do_it] => "Ping"}) do
+      with_test_class("Button", :states => ["On", "Off"], :initial_state => "Off", :transitions => {["On", :press] => "Off", ["Off", :press] => "On"}) do
+        pingpong = PingPong.new
+        button = Button.new
+        [pingpong.do_it, button.press, pingpong.do_it, button.press]
+      end
+    end
+  end
 end
 
 

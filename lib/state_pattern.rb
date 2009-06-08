@@ -31,6 +31,11 @@ module StatePattern
 
     def valid_transitions(transitions_hash)
       @transitions_hash = transitions_hash
+      @transitions_hash.each do |key, value|
+        if !value.respond_to?(:to_ary)
+          @transitions_hash[key] = [value]
+        end
+      end
     end
 
     def transitions_hash
@@ -75,12 +80,8 @@ module StatePattern
     trans = self.class.transitions_hash
     return true if trans.nil?
 
-    #TODO: ugly
-    trans.has_key?(from_module) &&
-      (trans[from_module] == to_module ||
-       trans[from_module].include?(to_module)) ||
-       trans.has_key?([from_module, current_event]) &&
-       (trans[[from_module, current_event]] == to_module || trans[[from_module, current_event]].include?(to_module))
+    valid_transition_targets = trans[from_module] || trans[[from_module, current_event]]
+    valid_transition_targets && valid_transition_targets.include?(to_module)
   end
 
   def state
