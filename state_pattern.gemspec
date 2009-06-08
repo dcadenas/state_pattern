@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/dcadenas/state_pattern}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
+  s.rubyforge_project = %q{statepattern}
   s.rubygems_version = %q{1.3.3}
   s.summary = %q{A Ruby state pattern implementation}
   s.test_files = [
