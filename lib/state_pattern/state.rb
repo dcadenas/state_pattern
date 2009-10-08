@@ -9,9 +9,5 @@ module StatePattern
     def transition_to(state_class)
       @stateable.transition_to(state_class)
     end
-
-    def state
-      self.class.to_s
-    end
   end
 end

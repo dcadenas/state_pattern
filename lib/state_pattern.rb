@@ -83,10 +83,6 @@ module StatePattern
     valid_transition_targets = trans[from_module] || trans[[from_module, @current_event]]
     valid_transition_targets && valid_transition_targets.include?(to_module)
   end
-
-  def state
-    current_state_instance.state
-  end
 end
 
 
