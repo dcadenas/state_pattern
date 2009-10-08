@@ -8,6 +8,3 @@ require 'test_class_creation_helper'
 
 include TestClassCreationHelper
 
-class Test::Unit::TestCase
-end
-

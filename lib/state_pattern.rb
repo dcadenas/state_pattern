@@ -28,6 +28,7 @@ module StatePattern
 
     def set_initial_state(state_class)
       @initial_state_class = state_class
+      delegate_all_state_events
     end
 
     def valid_transitions(transitions_hash)
@@ -46,7 +47,7 @@ module StatePattern
     def delegate_all_state_events
       state_methods.each do |state_method|
         define_method state_method do |*args|
-          delegate_to_event(state_method)
+          delegate_to_event(state_method, *args)
         end
       end
     end
@@ -56,24 +57,22 @@ module StatePattern
     end
   end
 
-  attr_accessor :current_state, :current_event
-  def initialize(*args)
-    super(*args)
-    set_state(self.class.initial_state_class)
-    self.class.delegate_all_state_events
+  def set_state(state_class = self.class.initial_state_class)
+    @current_state_instance = state_class.new(self, @current_state_instance)
   end
 
-  def set_state(state_class)
-    self.current_state = state_class.new(self, self.current_state)
+  def current_state_instance
+    set_state if @current_state_instance.nil?
+    @current_state_instance
   end
 
-  def delegate_to_event(method_name, *args)
-    self.current_event = method_name.to_sym
-    self.current_state.send(current_event, *args)
+  def delegate_to_event(method_name, *args, &block)
+    @current_event = method_name.to_sym
+    self.current_state_instance.send(@current_event, *args, &block)
   end
 
   def transition_to(state_class)
-    raise InvalidTransitionException.new(self.current_state.class, state_class, self.current_event) unless self.valid_transition?(self.current_state.class, state_class)
+    raise InvalidTransitionException.new(current_state_instance.class, state_class, @current_event) unless valid_transition?(current_state_instance.class, state_class)
     set_state(state_class)
   end
 
@@ -81,12 +80,12 @@ module StatePattern
     trans = self.class.transitions_hash
     return true if trans.nil?
 
-    valid_transition_targets = trans[from_module] || trans[[from_module, current_event]]
+    valid_transition_targets = trans[from_module] || trans[[from_module, @current_event]]
     valid_transition_targets && valid_transition_targets.include?(to_module)
   end
 
   def state
-    self.current_state.state
+    current_state_instance.state
   end
 end
 
