@@ -8,18 +8,7 @@ module StatePattern
 
   module ClassMethods
     def state_classes
-      state_classes_in_transisions_hash = []
-
-      if transitions_hash
-        state_classes_in_transisions_hash = transitions_hash.map do |from, to|
-          from_class = from.respond_to?(:to_ary) ? from.first : from
-          to_classes = to.respond_to?(:to_ary) ? to : [to]
-          to_classes + [from_class]
-        end.flatten
-      end
-
-      state_classes_in_transisions_hash << initial_state_class
-      state_classes_in_transisions_hash.uniq
+      (transitions_hash.to_a << initial_state_class).flatten.uniq
     end
 
     def initial_state_class
@@ -72,15 +61,19 @@ module StatePattern
   end
 
   def transition_to(state_class)
-    raise InvalidTransitionException.new(current_state_instance.class, state_class, @current_event) unless valid_transition?(current_state_instance.class, state_class)
+    raise_invalid_transition_to(state_class) unless valid_transition?(current_state_instance.class, state_class)
     set_state(state_class)
   end
 
-  def valid_transition?(from_module, to_module)
-    trans = self.class.transitions_hash
-    return true if trans.nil?
+  def raise_invalid_transition_to(state_class)
+    raise InvalidTransitionException.new(current_state_instance.class, state_class, @current_event)
+  end
 
-    valid_transition_targets = trans[from_module] || trans[[from_module, @current_event]]
+  def valid_transition?(from_module, to_module)
+    transition = self.class.transitions_hash
+    return true if transition.nil?
+
+    valid_transition_targets = transition[from_module] || transition[[from_module, @current_event]]
     valid_transition_targets && valid_transition_targets.include?(to_module)
   end
 end
