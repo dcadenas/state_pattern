@@ -13,15 +13,7 @@ module StatePattern
 
     def set_initial_state(state_class)
       @initial_state_class = state_class
-      delegate_all_state_methods
-    end
-
-    def delegate_all_state_methods
-      state_methods.each do |state_method|
-        define_method state_method do |*args|
-          delegate_to_state(state_method, *args)
-        end
-      end
+      create_methods
     end
 
     def state_methods
@@ -42,10 +34,43 @@ module StatePattern
       @transitions_hash.each do |key, value|
         @transitions_hash[key] = [value] if !value.respond_to?(:to_ary)
       end
+      create_methods
     end
 
     def transitions_hash
       @transitions_hash
+    end
+
+  private
+    def create_methods
+      delegate_all_state_methods
+      create_query_methods
+    end
+
+    def delegate_all_state_methods
+      state_methods.each do |state_method|
+        define_method state_method do |*args|
+          delegate_to_state(state_method, *args)
+        end unless respond_to?(state_method)
+      end
+    end
+
+    def create_query_methods
+      state_classes.each do |state_class|
+        method_name = "#{underscore(state_class.name.split("::").last)}?"
+        define_method method_name do
+          current_state_instance.class == state_class
+        end unless respond_to?(method_name)
+      end
+    end
+
+    def underscore(camel_cased_word)
+      camel_cased_word.to_s.gsub(/\W/, "_")
+      camel_cased_word.to_s.gsub(/::/, '/').
+      gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+      gsub(/([a-z\d])([A-Z])/,'\1_\2').
+      tr("-", "_").
+      downcase
     end
   end
 

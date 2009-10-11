@@ -2,49 +2,69 @@
 
 A Ruby state pattern implementation.
 
+== Example
+
+Let's use one nice example from the AASM documentation and translate it to state_pattern (but keep in mind state_pattern is a generic gem, AASM is a Rails plugin):
+
   require 'rubygems'
   require 'state_pattern'
 
-  class On < StatePattern::State
-    def press
-      transition_to(Off)
-      #stateable represents the button object that can be in this state
-      "#{stateable.button_name} is off"
+  class Dating < StatePattern::State
+    def get_intimate
+      transition_to(Intimate) if stateable.drunk?
+    end
+
+    def get_married
+      transition_to(Married) if stateable.willing_to_give_up_manhood?
     end
 
     def enter
-      #code to run whenever the button enters this state, doesn't matter which state it's coming from
+      stateable.make_happy
     end
 
     def exit
-      #code to run whenever the button transitions to another state
-    end
-  end
-  
-  class Off < StatePattern::State
-    def press
-      transition_to(On)
-      "#{stateable.button_name} is on"
-    end
-  end
-  
-  class Button
-    include StatePattern
-    set_initial_state Off
-    valid_transitions [On, :press] => Off, [Off, :press] => On
-  
-    def button_name
-      "Light button"
+      stateable.make_depressed
     end
   end
 
-  button = Button.new
-  puts button.press # => "Light button is on"
-  puts button.press # => "Light button is off"
-  puts button.press # => "Light button is on"
-  puts Button.state_classes => [On, Off]
-  puts Button.state_events => ["press"]
-  
+  class Intimate < StatePattern::State
+    def get_married
+      transition_to(Married) if stateable.willing_to_give_up_manhood?
+    end
+
+    def enter
+      stateable.make_very_happy
+    end
+
+    def exit
+      stateable.never_speak_again
+    end
+  end
+
+  class Married < StatePattern::State
+    def enter
+      stateable.give_up_intimacy
+    end
+
+    def exit
+      stateable.buy_exotic_car_and_wear_a_combover
+    end
+  end
+
+  class Relationship
+    include StatePattern
+    set_initial_state Dating
+    valid_transitions [Dating, :get_intimate] => Intimate, [Dating, :get_married] => Married, [Intimate, :get_married] => Married
+
+    def drunk?; @drunk; end
+    def willing_to_give_up_manhood?; @give_up_manhood; end
+    def make_happy; end
+    def make_depressed; end
+    def make_very_happy; end
+    def never_speak_again; end
+    def give_up_intimacy; end
+    def buy_exotic_car_and_wear_a_combover; end
+  end
 
 == Validations
 
@@ -70,7 +90,7 @@ You can also use the exit hook which is triggered when a successfull transition 
 == Querying
 
 The state pattern is a very dynamic way of representing a state machine, very few things are hard-coded and everything can change on runtime.
-This means that the only way we have to query a list of the state classes and events that are used, is parsing the valid_transitions list and inspecting the public methods of each state class found.
+This means that the only way (apart from parsing ruby code) to get a list of the state classes and events that are used, is inspecting the valid_transitions array.
 So assuming that you completely draw your state machine with valid_transitions (which is always recommended) you can use the class methods state_classes and state_events to get a list of states and events respectively.
 
 == Installation

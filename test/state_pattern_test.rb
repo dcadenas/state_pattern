@@ -6,6 +6,9 @@ module Family
       transition_to(Lynn)
       "James #{stateable.last_name}"
     end
+
+    def james_method
+    end
   end
 
   class Lynn < StatePattern::State
@@ -48,6 +51,10 @@ Expectations do
     member.name 
     member.name 
     member.name 
+  end
+
+  expect true do
+    Family::Member.new.respond_to?(:james_method)
   end
 
   expect "on" do

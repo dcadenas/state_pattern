@@ -13,6 +13,7 @@ module Querying
 
   class On < StateBase
     def press
+      transition_to(Off)
     end
 
     def one_event
@@ -33,6 +34,7 @@ module Querying
 
   class Off < StateBase
     def press
+      transition_to(On)
     end
 
     def one_event
@@ -60,6 +62,26 @@ Expectations do
 
   expect [:press] do
     Querying::Button.state_events
+  end
+
+  expect true do
+    Querying::Button.new.on?
+  end
+
+  expect false do
+    Querying::Button.new.off?
+  end
+
+  expect false do
+    button = Querying::Button.new
+    button.press
+    button.on?
+  end
+
+  expect true do
+    button = Querying::Button.new
+    button.press
+    button.off?
   end
 end
 
