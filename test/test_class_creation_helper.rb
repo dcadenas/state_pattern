@@ -39,7 +39,7 @@ module TestClassCreationHelper
     begin
       yield
     ensure 
-      created_consts.each do |created_const|
+      created_consts.compact.each do |created_const|
         Object.send(:remove_const, created_const.to_s.to_sym)
       end
     end

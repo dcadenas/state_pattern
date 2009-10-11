@@ -7,10 +7,6 @@ module StatePattern
   end
 
   module ClassMethods
-    def state_classes
-      (transitions_hash.to_a << initial_state_class).flatten.uniq
-    end
-
     def initial_state_class
       @initial_state_class
     end
@@ -18,19 +14,6 @@ module StatePattern
     def set_initial_state(state_class)
       @initial_state_class = state_class
       delegate_all_state_events
-    end
-
-    def valid_transitions(transitions_hash)
-      @transitions_hash = transitions_hash
-      @transitions_hash.each do |key, value|
-        if !value.respond_to?(:to_ary)
-          @transitions_hash[key] = [value]
-        end
-      end
-    end
-
-    def transitions_hash
-      @transitions_hash
     end
 
     def delegate_all_state_events
@@ -44,38 +27,53 @@ module StatePattern
     def state_methods
       state_classes.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq
     end
+
+    def state_classes
+      (transitions_hash.to_a << initial_state_class).flatten.uniq
+    end
+
+    def valid_transitions(transitions_hash)
+      @transitions_hash = transitions_hash
+      @transitions_hash.each do |key, value|
+        @transitions_hash[key] = [value] if !value.respond_to?(:to_ary)
+      end
+    end
+
+    def transitions_hash
+      @transitions_hash
+    end
   end
 
-  def set_state(state_class = self.class.initial_state_class)
+  def set_state(state_class = nil)
+    state_class ||= self.class.initial_state_class
+    return @current_state_instance if @current_state_instance.class == state_class
     @current_state_instance = state_class.new(self, @current_state_instance)
   end
-
+    
   def current_state_instance
     set_state if @current_state_instance.nil?
     @current_state_instance
   end
 
-  def delegate_to_event(method_name, *args, &block)
-    @current_event = method_name.to_sym
+  def delegate_to_event(event_method_name, *args, &block)
+    @current_event = event_method_name.to_sym
     self.current_state_instance.send(@current_event, *args, &block)
   end
 
-  def transition_to(state_class)
-    raise_invalid_transition_to(state_class) unless valid_transition?(current_state_instance.class, state_class)
-    set_state(state_class)
+  def transition_to(next_state_class)
+    raise_invalid_transition_to(next_state_class) unless valid_transition?(current_state_instance.class, next_state_class)
+    set_state(next_state_class)
   end
 
   def raise_invalid_transition_to(state_class)
     raise InvalidTransitionException.new(current_state_instance.class, state_class, @current_event)
   end
 
-  def valid_transition?(from_module, to_module)
-    transition = self.class.transitions_hash
-    return true if transition.nil?
+  def valid_transition?(from_state, to_state)
+    transitions = self.class.transitions_hash
+    return true if transitions.nil?
 
-    valid_transition_targets = transition[from_module] || transition[[from_module, @current_event]]
-    valid_transition_targets && valid_transition_targets.include?(to_module)
+    valid_transition_targets = transitions[from_state] || transitions[[from_state, @current_event]]
+    valid_transition_targets && valid_transition_targets.include?(to_state)
   end
 end
-
-
