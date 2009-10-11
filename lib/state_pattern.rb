@@ -62,6 +62,7 @@ module StatePattern
 
   def transition_to(next_state_class)
     raise_invalid_transition_to(next_state_class) unless valid_transition?(current_state_instance.class, next_state_class)
+    current_state_instance.exit
     set_state(next_state_class)
   end
 
