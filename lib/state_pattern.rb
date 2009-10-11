@@ -17,19 +17,19 @@ module StatePattern
     end
 
     def delegate_all_state_events
-      state_methods.each do |state_method|
-        define_method state_method do |*args|
-          delegate_to_event(state_method, *args)
+      state_events.each do |state_event|
+        define_method state_event do |*args|
+          delegate_to_event(state_event, *args)
         end
       end
     end
 
-    def state_methods
-      state_classes.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq
+    def state_events
+      state_classes.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq - ["enter", "exit"]
     end
 
     def state_classes
-      (transitions_hash.to_a << initial_state_class).flatten.uniq
+      (transitions_hash.to_a << initial_state_class).flatten.uniq.select{|t| t.respond_to?(:ancestors) && t.ancestors.include?(StatePattern::State)}
     end
 
     def valid_transitions(transitions_hash)

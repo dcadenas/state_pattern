@@ -8,7 +8,16 @@ A Ruby state pattern implementation.
   class On < StatePattern::State
     def press
       transition_to(Off)
+      #stateable represents the button object that can be in this state
       "#{stateable.button_name} is off"
+    end
+
+    def enter
+      #code to run whenever the button enters this state, doesn't matter which state it's coming from
+    end
+
+    def exit
+      #code to run whenever the button transitions to another state
     end
   end
   
@@ -33,9 +42,9 @@ A Ruby state pattern implementation.
   puts button.press # => "Light button is on"
   puts button.press # => "Light button is off"
   puts button.press # => "Light button is on"
-
-== Installation
-  sudo gem install state_pattern
+  puts Button.state_classes => [On, Off]
+  puts Button.state_events => ["press"]
+  
 
 == Validations
 
@@ -52,6 +61,21 @@ With more than one target state
 
 Using event names to gain more detail
   valid_transitions [Up, :switch] => [Middle, Down], [Down, :switch] => Middle, [Middle, :switch] => Up 
+
+== Enter and exit hooks
+
+Inside your state classes, any code that you put inside the enter method will be executed when the state is instantiated.
+You can also use the exit hook which is triggered when a successfull transition to another state takes place.
+
+== Querying
+
+The state pattern is a very dynamic way of representing a state machine, very few things are hard-coded and everything can change on runtime.
+This means that the only way we have to query a list of the state classes and events that are used, is parsing the valid_transitions list and inspecting the public methods of each state class found.
+So assuming that you completely draw your state machine with valid_transitions (which is always recommended) you can use the model class methods state_classes and state_events to get a list of states and events respectively.
+
+== Installation
+
+  sudo gem install state_pattern
 
 == Collaborate
 
