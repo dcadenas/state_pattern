@@ -1,7 +1,17 @@
 require 'test_helper'
 
 module Querying
-  class On < StatePattern::State
+  class StateBaseBase < StatePattern::State
+    def common_event
+    end
+  end
+
+  class StateBase < StateBaseBase
+    def another_common_event
+    end
+  end
+
+  class On < StateBase
     def press
     end
 
@@ -21,7 +31,7 @@ module Querying
     end
   end
 
-  class Off < StatePattern::State
+  class Off < StateBase
     def press
     end
 
@@ -44,7 +54,7 @@ Expectations do
     Querying::Button.state_classes.map{|c| c.name}.sort
   end
 
-  expect ["another_event", "one_event", "press"] do
+  expect ["another_common_event", "another_event", "common_event", "one_event", "press"] do
     Querying::Button.state_events.sort
   end
 end

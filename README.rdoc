@@ -71,7 +71,7 @@ You can also use the exit hook which is triggered when a successfull transition 
 
 The state pattern is a very dynamic way of representing a state machine, very few things are hard-coded and everything can change on runtime.
 This means that the only way we have to query a list of the state classes and events that are used, is parsing the valid_transitions list and inspecting the public methods of each state class found.
-So assuming that you completely draw your state machine with valid_transitions (which is always recommended) you can use the model class methods state_classes and state_events to get a list of states and events respectively.
+So assuming that you completely draw your state machine with valid_transitions (which is always recommended) you can use the class methods state_classes and state_events to get a list of states and events respectively.
 
 == Installation
 
