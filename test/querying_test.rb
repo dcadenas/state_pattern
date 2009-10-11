@@ -55,7 +55,11 @@ Expectations do
   end
 
   expect ["another_common_event", "another_event", "common_event", "one_event", "press"] do
-    Querying::Button.state_events.sort
+    Querying::Button.state_methods.map{|s| s.to_s}.sort
+  end
+
+  expect [:press] do
+    Querying::Button.state_events
   end
 end
 

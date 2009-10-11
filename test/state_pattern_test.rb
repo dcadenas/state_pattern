@@ -22,7 +22,7 @@ module Family
 
     #notice this method is optional, it will be delegated automatically if removed
     def name
-      delegate_to_event :name
+      delegate_to_state :name
     end
 
     def last_name

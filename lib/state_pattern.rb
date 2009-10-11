@@ -13,20 +13,24 @@ module StatePattern
 
     def set_initial_state(state_class)
       @initial_state_class = state_class
-      delegate_all_state_events
+      delegate_all_state_methods
     end
 
-    def delegate_all_state_events
-      state_events.each do |state_event|
-        define_method state_event do |*args|
-          delegate_to_event(state_event, *args)
+    def delegate_all_state_methods
+      state_methods.each do |state_method|
+        define_method state_method do |*args|
+          delegate_to_state(state_method, *args)
         end
       end
     end
 
-    def state_events
+    def state_methods
       state_classes_with_their_bases = state_classes.map{|c| c.ancestors.select{|a| a.ancestors.include?(StatePattern::State) && a != StatePattern::State}}.flatten.uniq
-      state_classes_with_their_bases.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq - ["enter", "exit"]
+      (state_classes_with_their_bases.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq - ["enter", "exit"]).map{|s| s.to_sym}
+    end
+
+    def state_events
+      transitions_hash.to_a.flatten.uniq.select{|t| t.respond_to?(:to_sym)}.map{|s| s.to_sym}
     end
 
     def state_classes
@@ -56,9 +60,9 @@ module StatePattern
     @current_state_instance
   end
 
-  def delegate_to_event(event_method_name, *args, &block)
-    @current_event = event_method_name.to_sym
-    self.current_state_instance.send(@current_event, *args, &block)
+  def delegate_to_state(state_method_name, *args, &block)
+    @current_method = state_method_name.to_sym
+    self.current_state_instance.send(@current_method, *args, &block)
   end
 
   def transition_to(next_state_class)
@@ -68,14 +72,14 @@ module StatePattern
   end
 
   def raise_invalid_transition_to(state_class)
-    raise InvalidTransitionException.new(current_state_instance.class, state_class, @current_event)
+    raise InvalidTransitionException.new(current_state_instance.class, state_class, @current_method)
   end
 
   def valid_transition?(from_state, to_state)
     transitions = self.class.transitions_hash
     return true if transitions.nil?
 
-    valid_transition_targets = transitions[from_state] || transitions[[from_state, @current_event]]
+    valid_transition_targets = transitions[from_state] || transitions[[from_state, @current_method]]
     valid_transition_targets && valid_transition_targets.include?(to_state)
   end
 end
