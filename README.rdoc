@@ -4,7 +4,7 @@ A Ruby state pattern implementation.
 
 == Example
 
-Let's use one nice example from the AASM documentation and translate it to state_pattern (but keep in mind state_pattern is a generic gem, AASM is a Rails plugin):
+Let's use one nice example from the AASM documentation and translate it to state_pattern.
 
   require 'rubygems'
   require 'state_pattern'
