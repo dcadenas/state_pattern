@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{state_pattern}
-  s.version = "1.1.0"
+  s.version = "1.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Daniel Cadenas"]
-  s.date = %q{2009-06-08}
+  s.date = %q{2009-10-12}
   s.email = %q{dcadenas@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -23,6 +23,9 @@ Gem::Specification.new do |s|
      "lib/state_pattern/invalid_transition_exception.rb",
      "lib/state_pattern/state.rb",
      "state_pattern.gemspec",
+     "test/arguments_of_event_delegation_test.rb",
+     "test/hook_test.rb",
+     "test/querying_test.rb",
      "test/state_pattern_test.rb",
      "test/test_class_creation_helper.rb",
      "test/test_helper.rb",
@@ -35,7 +38,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.3}
   s.summary = %q{A Ruby state pattern implementation}
   s.test_files = [
-    "test/state_pattern_test.rb",
+    "test/arguments_of_event_delegation_test.rb",
+     "test/hook_test.rb",
+     "test/querying_test.rb",
+     "test/state_pattern_test.rb",
      "test/test_class_creation_helper.rb",
      "test/test_helper.rb",
      "test/transition_validations_test.rb"
