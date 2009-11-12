@@ -2,9 +2,59 @@
 
 A Ruby state pattern implementation.
 
-== Example
+== Examples
 
-Let's use one nice example from the AASM documentation and translate it to state_pattern.
+A simple example that mimics a traffic semaphore
+
+  require 'rubygems'
+  require 'state_pattern'
+
+  class Stop < StatePattern::State
+    def next
+      sleep 3
+      transition_to(Go)
+    end
+
+    def color
+      "Red"
+    end
+  end
+
+  class Go < StatePattern::State
+    def next
+      sleep 2
+      transition_to(Caution)
+    end
+
+    def color
+      "Green"
+    end
+  end
+
+  class Caution < StatePattern::State
+    def next
+      sleep 1
+      transition_to(Stop)
+    end
+
+    def color
+      "Amber"
+    end
+  end
+
+  class TrafficSemaphore
+    include StatePattern
+    set_initial_state Stop
+  end
+
+  semaphore = TrafficSemaphore.new
+
+  loop do
+    puts semaphore.color
+    semaphore.next
+  end
+
+Let's now use one nice example from the AASM documentation and translate it to state_pattern.
 
   require 'rubygems'
   require 'state_pattern'
