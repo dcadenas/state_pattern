@@ -4,9 +4,21 @@ A Ruby state pattern implementation.
 
 This library intentionally follows the classic state pattern implementation (no mixins, classical delegation to simple state classes, etc.) believing that it increases flexibility (internal DSL constraints vs plain object oriented Ruby power), simplicity and clarity.
 
+== Usage and functionality summary
+
+* Define the set of states you want your stateable object to have by creating a class for each state and inheriting from +StatePattern:State+.
+* All public methods defined in this state classes are delegation targets from the stateable object so they will all be available (except +enter+ and +exit+, see below). 
+* Inside each state instance you can access the stateable object through the +stateable+ method.
+* Inside each state instance you can access the previous state through the +previous_state+ method.
+* Define +enter+ or +exit+ methods to hook any behaviour you want to execute whenever the stateable object enters or exits the state.
+* An event is just a method that calls +transition_to+ at some point.
+* If you want guards for some event just use plain old conditional logic before your +transition_to+.
+* In the stateful object you must +set_initial_state+ and you could also define which are +valid_transitions+.
+* If you completely describe your state machine through +valid_transitions+, then you can user +state_classes+ and +state_events+ to get the available set of classes and events.
+
 == Examples
 
-A simple example that mimics a traffic semaphore
+So here's a simple example that mimics a traffic semaphore
 
   require 'rubygems'
   require 'state_pattern'
@@ -121,7 +133,7 @@ Let's now use one nice example from the AASM documentation and translate it to s
 == Validations
 
 One of the few drawbacks the state pattern has is that it can get difficult to see the global picture of your state machine when dealing with complex cases.
-To deal with this problem you have the option of using the valid_transitions statement to "draw" your state diagram in code. Whenever a state transition is performed, the valid_transitions hash is checked and if the transition is not valid a StatePattern::InvalidTransitionException is thrown.
+To deal with this problem you have the option of using the +valid_transitions+ statement to "draw" your state diagram in code. Whenever a state transition is performed, the valid_transitions hash is checked and if the transition is not valid a StatePattern::InvalidTransitionException is thrown.
 
 Examples:
 
@@ -137,13 +149,13 @@ Using event names to gain more detail
 == Enter and exit hooks
 
 Inside your state classes, any code that you put inside the enter method will be executed when the state is instantiated.
-You can also use the exit hook which is triggered when a successfull transition to another state takes place.
+You can also use the exit hook which is triggered when a successful transition to another state takes place.
 
 == Querying
 
 The state pattern is a very dynamic way of representing a state machine, very few things are hard-coded and everything can change on runtime.
-This means that the only way (apart from parsing ruby code) to get a list of the state classes and events that are used, is inspecting the valid_transitions array.
-So assuming that you completely draw your state machine with valid_transitions (which is always recommended) you can use the class methods state_classes and state_events to get a list of states and events respectively.
+This means that the only way (apart from parsing ruby code) to get a list of the state classes and events that are used, is inspecting the +valid_transitions+ array.
+So assuming that you completely draw your state machine with +valid_transitions+ (which is always recommended) you can use the class methods +state_classes+ and +state_events+ to get a list of states and events respectively.
 
 == Installation
 
