@@ -6,8 +6,10 @@ This library intentionally follows the classic state pattern implementation (no 
 
 == Usage and functionality summary
 
+
 * Define the set of states you want your stateable object to have by creating a class for each state and inheriting from +StatePattern:State+.
 * All public methods defined in this state classes are delegation targets from the stateable object so they will all be available (except +enter+ and +exit+, see below). 
+* If automatic delegation to the current state public methods is not enough for your stateful object needs then you can manually perform the delegation using +delegate_to_state+.
 * Inside each state instance you can access the stateable object through the +stateable+ method.
 * Inside each state instance you can access the previous state through the +previous_state+ method.
 * Define +enter+ or +exit+ methods to hook any behaviour you want to execute whenever the stateable object enters or exits the state.
@@ -156,6 +158,21 @@ You can also use the exit hook which is triggered when a successful transition t
 The state pattern is a very dynamic way of representing a state machine, very few things are hard-coded and everything can change on runtime.
 This means that the only way (apart from parsing ruby code) to get a list of the state classes and events that are used, is inspecting the +valid_transitions+ array.
 So assuming that you completely draw your state machine with +valid_transitions+ (which is always recommended) you can use the class methods +state_classes+ and +state_events+ to get a list of states and events respectively.
+
+== Overriding automatic delegation
+
+If automatic delegation to the current state public methods is not enough for your stateful object needs then you can manually perform the delegation using +delegate_to_state+:
+
+  class TrafficSemaphore
+    include StatePattern
+    set_initial_state Stop
+
+    def color
+      # do something
+      delegate_to_state :color
+      # do something
+    end
+  end
 
 == Installation
 
