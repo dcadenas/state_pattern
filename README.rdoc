@@ -2,6 +2,8 @@
 
 A Ruby state pattern implementation.
 
+This library intentionally follows the classic state pattern implementation (no mixins, classical delegation to simple state classes, etc.) believing that it increases flexibility (internal DSL constraints vs plain object oriented Ruby power), simplicity and clarity.
+
 == Examples
 
 A simple example that mimics a traffic semaphore
