@@ -4,6 +4,8 @@ A Ruby state pattern implementation.
 
 This library intentionally follows the classic state pattern implementation (no mixins, classical delegation to simple state classes, etc.) believing that it increases flexibility (internal DSL constraints vs plain object oriented Ruby power), simplicity and clarity.
 
+This is a framework agnostic gem, for an adapted version for Rails please see {active_record_state_pattern}[http://github.com/dcadenas/active_record_state_pattern].
+
 == Usage and functionality summary
 
 
