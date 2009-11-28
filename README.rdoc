@@ -27,40 +27,43 @@ So here's a simple example that mimics a traffic semaphore
   require 'rubygems'
   require 'state_pattern'
 
-  class Stop < StatePattern::State
-    def next
-      sleep 3
-      transition_to(Go)
+  module TrafficSemaphoreStates
+    class Stop < StatePattern::State
+      def next
+        sleep 3
+        transition_to(Go)
+      end
+
+      def color
+        "Red"
+      end
     end
 
-    def color
-      "Red"
-    end
-  end
+    class Go < StatePattern::State
+      def next
+        sleep 2
+        transition_to(Caution)
+      end
 
-  class Go < StatePattern::State
-    def next
-      sleep 2
-      transition_to(Caution)
-    end
-
-    def color
-      "Green"
-    end
-  end
-
-  class Caution < StatePattern::State
-    def next
-      sleep 1
-      transition_to(Stop)
+      def color
+        "Green"
+      end
     end
 
-    def color
-      "Amber"
+    class Caution < StatePattern::State
+      def next
+        sleep 1
+        transition_to(Stop)
+      end
+
+      def color
+        "Amber"
+      end
     end
   end
 
   class TrafficSemaphore
+    include TrafficSemaphoreStates
     include StatePattern
     set_initial_state Stop
   end
