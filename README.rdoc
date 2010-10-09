@@ -189,7 +189,7 @@ Please see the examples folder for a Rails 3 example.
 === Example
 
 Note this is not the best example to show as ideally this plugin should be used with lot of state dependent behaviour and this is not the case.
-Remember to put each class in its correct file following Rails naming conventions.
+Remember to put each state class in its correct directory and following Rails naming conventions so they are correctly loaded in the load path.
 
   module BlogStates
     class StateBase < StatePattern::State

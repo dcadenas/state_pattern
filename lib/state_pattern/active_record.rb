@@ -8,7 +8,13 @@ module StatePattern
         def set_state_from_db
           set_state(state_string_as_class)
         end
-        def self.after_initialize; end
+
+        #enable after_initialize callback
+        if Rails.version >= "3.0.0"
+          def self.after_initialize; end
+        else
+          def after_initialize; end
+        end
 
         def set_state_with_active_record_attribute(state_class = nil)
           set_state_without_active_record_attribute(state_class)
@@ -35,3 +41,4 @@ module StatePattern
     end
   end
 end
+
