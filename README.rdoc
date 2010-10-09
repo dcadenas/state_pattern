@@ -184,6 +184,8 @@ To use the state pattern in your Rails models you need to:
 * Include StatePattern::ActiveRecord in your model file
 * Use the state pattern as you would do in a plain Ruby class as shown above
 
+Please see the examples folder for a Rails 3 example.
+
 === Example
 
 Note this is not the best example to show as ideally this plugin should be used with lot of state dependent behaviour and this is not the case.
@@ -269,7 +271,7 @@ By default StatePattern::ActiveRecord expects a column named 'state' in the mode
 
 === How do I decide? state_pattern or {AASM}[http://github.com/rubyist/aasm]?
 
-* Lot of state dependent behavior? Lot of conditional logic? => state_pattern
+* Lot of state dependent behavior? Lot of conditional logic depending on the state? => state_pattern
 * Not much state dependent behavior? => AASM
 
 
