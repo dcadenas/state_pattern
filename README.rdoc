@@ -4,7 +4,7 @@ A Ruby state pattern implementation.
 
 This library intentionally follows the classic state pattern implementation (no mixins, classical delegation to simple state classes, etc.) believing that it increases flexibility (internal DSL constraints vs plain object oriented Ruby power), simplicity and clarity.
 
-This is a framework agnostic gem, for an adapted version for Rails please see {active_record_state_pattern}[http://github.com/dcadenas/active_record_state_pattern].
+The gem is ready for Rails active record integration (see below and the examples folder).
 
 == Usage and functionality summary
 
@@ -27,43 +27,40 @@ So here's a simple example that mimics a traffic semaphore
   require 'rubygems'
   require 'state_pattern'
 
-  module TrafficSemaphoreStates
-    class Stop < StatePattern::State
-      def next
-        sleep 3
-        transition_to(Go)
-      end
-
-      def color
-        "Red"
-      end
+  class Stop < StatePattern::State
+    def next
+      sleep 3
+      transition_to(Go)
     end
 
-    class Go < StatePattern::State
-      def next
-        sleep 2
-        transition_to(Caution)
-      end
+    def color
+      "Red"
+    end
+  end
 
-      def color
-        "Green"
-      end
+  class Go < StatePattern::State
+    def next
+      sleep 2
+      transition_to(Caution)
     end
 
-    class Caution < StatePattern::State
-      def next
-        sleep 1
-        transition_to(Stop)
-      end
+    def color
+      "Green"
+    end
+  end
 
-      def color
-        "Amber"
-      end
+  class Caution < StatePattern::State
+    def next
+      sleep 1
+      transition_to(Stop)
+    end
+
+    def color
+      "Amber"
     end
   end
 
   class TrafficSemaphore
-    include TrafficSemaphoreStates
     include StatePattern
     set_initial_state Stop
   end
@@ -178,6 +175,103 @@ If automatic delegation to the current state public methods is not enough for yo
       # do something
     end
   end
+
+== Rails
+
+To use the state pattern in your Rails models you need to:
+
+* Add a state column for your model table of type string
+* Include StatePattern::ActiveRecord in your model file
+* Use the state pattern as you would do in a plain Ruby class as shown above
+
+=== Example
+
+Note this is not the best example to show as ideally this plugin should be used with lot of state dependent behaviour and this is not the case.
+Remember to put each class in its correct file following Rails naming conventions.
+
+  module BlogStates
+    class StateBase < StatePattern::State
+      def submit!
+      end
+
+      def publish!
+      end
+
+      def reject!
+        transition_to(Rejected)
+        stateable.save!
+      end
+
+      def verify!
+      end
+    end
+
+    class Published < StateBase
+    end
+
+    class Pending < StateBase
+      def publish!
+        transition_to(Published) if stateable.valid?
+        stateable.save!
+      end
+    end
+
+    class Unverified < StateBase
+      def submit!
+        if stateable.submitter.manager?
+          if stateable.profile_complete?
+            transition_to(Published)
+          else
+            transition_to(Pending)
+          end
+
+          stateable.save!
+        end
+      end
+
+      def verify!
+        transition_to(Pending)
+        stateable.save!
+      end
+    end
+
+    class Rejected < StateBase
+      def publish!
+        transition_to(Published) if stateable.valid?
+        stateable.save!
+      end
+
+      def enter
+        Notifier.notify_blog_owner(stateable)
+      end
+    end
+  end
+
+  class Blog < ActiveRecord::Base
+    include StatePattern::ActiveRecord
+    set_initial_state Unverified
+    valid_transitions [Unverified, :submit!] => [Published, Pending, Unverified], [Unverified, :verify!] => Pending, [Unverified, :reject!] => Rejected,
+                      [Pending, :publish!] => Published, [Pending, :reject!] => Rejected,
+                      [Rejected, :publish!] => Published, [Rejected, :reject!] => Rejected,
+                      [Published, :reject!] => Rejected
+
+     .
+     .
+     .
+
+  end
+
+=== The state attribute
+
+By default StatePattern::ActiveRecord expects a column named 'state' in the model. If you prefer to use another attribute do:
+
+  set_state_attribute :state_column
+
+=== How do I decide? state_pattern or {AASM}[http://github.com/rubyist/aasm]?
+
+* Lot of state dependent behavior? Lot of conditional logic? => state_pattern
+* Not much state dependent behavior? => AASM
+
 
 == Installation
 

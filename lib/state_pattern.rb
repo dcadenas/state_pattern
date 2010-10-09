@@ -79,7 +79,7 @@ module StatePattern
     return @current_state_instance if @current_state_instance.class == state_class
     @current_state_instance = state_class.new(self, @current_state_instance)
   end
-    
+
   def current_state_instance
     set_state if @current_state_instance.nil?
     @current_state_instance
@@ -108,3 +108,5 @@ module StatePattern
     valid_transition_targets && valid_transition_targets.include?(to_state)
   end
 end
+
+require 'state_pattern/active_record' if defined? ActiveRecord::Base
