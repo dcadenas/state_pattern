@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'rails'
 require 'active_record'
 
 {
@@ -13,7 +14,7 @@ require 'active_record'
 end
 
 #Nulldb expects Rails.root to be defined
-class Rails
+module Rails
   def self.root
     File.dirname(__FILE__)
   end

@@ -7,6 +7,10 @@ module StatePattern
       enter
     end
 
+    def self.state_methods
+      public_instance_methods - State.public_instance_methods
+    end
+
     def transition_to(state_class)
       @stateable.transition_to(state_class)
     end

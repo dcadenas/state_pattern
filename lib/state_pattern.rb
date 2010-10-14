@@ -17,8 +17,7 @@ module StatePattern
     end
 
     def state_methods
-      state_classes_with_their_bases = state_classes.map{|c| c.ancestors.select{|a| a.ancestors.include?(StatePattern::State) && a != StatePattern::State}}.flatten.uniq
-      (state_classes_with_their_bases.map{|state_class| state_class.public_instance_methods(false)}.flatten.uniq - ["enter", "exit"]).map{|s| s.to_sym}
+      state_classes.map{|state_class| state_class.state_methods}.flatten.uniq
     end
 
     def state_events
