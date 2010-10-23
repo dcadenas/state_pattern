@@ -8,17 +8,15 @@ The gem is ready for Rails active record integration (see below and the examples
 
 == Usage and functionality summary
 
-
-* Define the set of states you want your stateable object to have by creating a class for each state and inheriting from +StatePattern:State+.
-* All public methods defined in this state classes are delegation targets from the stateable object so they will all be available (except +enter+ and +exit+, see below). 
-* If automatic delegation to the current state public methods is not enough for your stateful object needs then you can manually perform the delegation using +delegate_to_state+.
-* Inside each state instance you can access the stateable object through the +stateable+ method.
+* Define the set of states you want your stateful object to have by creating a class for each state and inheriting from +StatePattern:State+.
+* All public methods defined in this state classes, except +enter+ and +exit+ (see below), are then available to the stateful object and their behaviour will depend on the current state . 
+* If this automatic delegation to the current state public methods is not enough for your stateful object then you can just reopen the method and use super whenever you want to call the state implementation.
+* Inside each state instance you can access the stateful object through the +stateful+ method.
 * Inside each state instance you can access the previous state through the +previous_state+ method.
-* Define +enter+ or +exit+ methods to hook any behaviour you want to execute whenever the stateable object enters or exits the state.
+* Define +enter+ or +exit+ methods to hook any behaviour you want to execute whenever the stateful object enters or exits the state.
 * An event is just a method that calls +transition_to+ at some point.
-* If you want guards for some event just use plain old conditional logic before your +transition_to+.
-* In the stateful object you must +set_initial_state+ and you could also define which are +valid_transitions+.
-* If you completely describe your state machine through +valid_transitions+, then you can user +state_classes+ and +state_events+ to get the available set of classes and events.
+* If you want guards for some event just use plain old ifs before your +transition_to+.
+* In the stateful object you must +set_initial_state+.
 
 == Examples
 
@@ -79,50 +77,49 @@ Let's now use one nice example from the AASM documentation and translate it to s
 
   class Dating < StatePattern::State
     def get_intimate
-      transition_to(Intimate) if stateable.drunk?
+      transition_to(Intimate) if stateful.drunk?
     end
 
     def get_married
-      transition_to(Married) if stateable.willing_to_give_up_manhood?
+      transition_to(Married) if stateful.willing_to_give_up_manhood?
     end
 
     def enter
-      stateable.make_happy
+      stateful.make_happy
     end
 
     def exit
-      stateable.make_depressed
+      stateful.make_depressed
     end
   end
 
   class Intimate < StatePattern::State
     def get_married
-      transition_to(Married) if stateable.willing_to_give_up_manhood?
+      transition_to(Married) if stateful.willing_to_give_up_manhood?
     end
 
     def enter
-      stateable.make_very_happy
+      stateful.make_very_happy
     end
 
     def exit
-      stateable.never_speak_again
+      stateful.never_speak_again
     end
   end
 
   class Married < StatePattern::State
     def enter
-      stateable.give_up_intimacy
+      stateful.give_up_intimacy
     end
 
     def exit
-      stateable.buy_exotic_car_and_wear_a_combover
+      stateful.buy_exotic_car_and_wear_a_combover
     end
   end
 
   class Relationship
     include StatePattern
     set_initial_state Dating
-    valid_transitions [Dating, :get_intimate] => Intimate, [Dating, :get_married] => Married, [Intimate, :get_married] => Married
 
     def drunk?; @drunk; end
     def willing_to_give_up_manhood?; @give_up_manhood; end
@@ -134,45 +131,24 @@ Let's now use one nice example from the AASM documentation and translate it to s
     def buy_exotic_car_and_wear_a_combover; end
   end
 
-== Validations
-
-One of the few drawbacks the state pattern has is that it can get difficult to see the global picture of your state machine when dealing with complex cases.
-To deal with this problem you have the option of using the +valid_transitions+ statement to "draw" your state diagram in code. Whenever a state transition is performed, the valid_transitions hash is checked and if the transition is not valid a StatePattern::InvalidTransitionException is thrown.
-
-Examples:
-
-The most basic notation
-  valid_transitions On => Off, Off => On
-
-With more than one target state
-  valid_transitions Up => [Middle, Down], Down => Middle, Middle => Up 
-
-Using event names to gain more detail
-  valid_transitions [Up, :switch] => [Middle, Down], [Down, :switch] => Middle, [Middle, :switch] => Up 
-
 == Enter and exit hooks
 
 Inside your state classes, any code that you put inside the enter method will be executed when the state is instantiated.
 You can also use the exit hook which is triggered when a successful transition to another state takes place.
 
-== Querying
-
-The state pattern is a very dynamic way of representing a state machine, very few things are hard-coded and everything can change on runtime.
-This means that the only way (apart from parsing ruby code) to get a list of the state classes and events that are used, is inspecting the +valid_transitions+ array.
-So assuming that you completely draw your state machine with +valid_transitions+ (which is always recommended) you can use the class methods +state_classes+ and +state_events+ to get a list of states and events respectively.
-
 == Overriding automatic delegation
 
-If automatic delegation to the current state public methods is not enough for your stateful object needs then you can manually perform the delegation using +delegate_to_state+:
+If the automatic delegation to the current state public methods is not enough for your stateful object then you can just reopen the method and use super whenever you want to call the state implementation.
 
   class TrafficSemaphore
     include StatePattern
     set_initial_state Stop
 
     def color
-      # do something
-      delegate_to_state :color
-      # do something
+      # some great code here
+      # now we call the current state implementation
+      super 
+      # more cool hacking here
     end
   end
 
@@ -188,10 +164,10 @@ Please see the examples folder for a Rails 3 example.
 
 === Example
 
-Note this is not the best example to show as ideally this plugin should be used with lot of state dependent behaviour and this is not the case.
-Remember to put each state class in its correct directory and following Rails naming conventions so they are correctly loaded in the load path.
+Remember to put each class in its correct file following Rails naming conventions.
 
   module BlogStates
+    #we can put common state behaviour into a base state class or we could have implemented it inside the model with methods that call super, your choice
     class StateBase < StatePattern::State
       def submit!
       end
@@ -201,7 +177,7 @@ Remember to put each state class in its correct directory and following Rails na
 
       def reject!
         transition_to(Rejected)
-        stateable.save!
+        stateful.save!
       end
 
       def verify!
@@ -213,38 +189,38 @@ Remember to put each state class in its correct directory and following Rails na
 
     class Pending < StateBase
       def publish!
-        transition_to(Published) if stateable.valid?
-        stateable.save!
+        transition_to(Published) if stateful.valid?
+        stateful.save!
       end
     end
 
     class Unverified < StateBase
       def submit!
-        if stateable.submitter.manager?
-          if stateable.profile_complete?
+        if stateful.submitter.manager?
+          if stateful.profile_complete?
             transition_to(Published)
           else
             transition_to(Pending)
           end
 
-          stateable.save!
+          stateful.save!
         end
       end
 
       def verify!
         transition_to(Pending)
-        stateable.save!
+        stateful.save!
       end
     end
 
     class Rejected < StateBase
       def publish!
-        transition_to(Published) if stateable.valid?
-        stateable.save!
+        transition_to(Published) if stateful.valid?
+        stateful.save!
       end
 
       def enter
-        Notifier.notify_blog_owner(stateable)
+        Notifier.notify_blog_owner(stateful)
       end
     end
   end
@@ -252,10 +228,6 @@ Remember to put each state class in its correct directory and following Rails na
   class Blog < ActiveRecord::Base
     include StatePattern::ActiveRecord
     set_initial_state Unverified
-    valid_transitions [Unverified, :submit!] => [Published, Pending, Unverified], [Unverified, :verify!] => Pending, [Unverified, :reject!] => Rejected,
-                      [Pending, :publish!] => Published, [Pending, :reject!] => Rejected,
-                      [Rejected, :publish!] => Published, [Rejected, :reject!] => Rejected,
-                      [Published, :reject!] => Rejected
 
      .
      .
@@ -274,10 +246,14 @@ By default StatePattern::ActiveRecord expects a column named 'state' in the mode
 * Lot of state dependent behavior? Lot of conditional logic depending on the state? => state_pattern
 * Not much state dependent behavior? => AASM
 
+== Thanks
+
+* {Alvaro Gil}[http://github.com/zevarito] for being the first using this gem in a real Rails project.
+* {Nicolás Sanguinetti}[http://github.com/foca] for his great feedback.
 
 == Installation
 
-  sudo gem install state_pattern
+  gem install state_pattern
 
 == Collaborate
 

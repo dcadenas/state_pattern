@@ -4,20 +4,19 @@ class ARButton < ActiveRecord::Base
   class On < StatePattern::State
     def press
       transition_to(Off)
-      "#{stateable.button_name} is off"
+      "#{stateful.button_name} is off"
     end
   end
 
   class Off < StatePattern::State
     def press
       transition_to(On)
-      "#{stateable.button_name} is on"
+      "#{stateful.button_name} is on"
     end
   end
 
   include StatePattern::ActiveRecord
   set_initial_state Off
-  valid_transitions [On, :press] => Off, [Off, :press] => On
 
   def button_name
     "The button"

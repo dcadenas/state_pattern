@@ -4,7 +4,7 @@ module Family
   class James < StatePattern::State
     def name
       transition_to(Lynn)
-      "James #{stateable.last_name}"
+      "James #{stateful.last_name}"
     end
 
     def james_method
@@ -14,18 +14,19 @@ module Family
   class Lynn < StatePattern::State
     def name
       transition_to(James)
-      "Lynn #{stateable.last_name}"
+      "Lynn #{stateful.last_name}"
+    end
+
+    def james_method
     end
   end
 
   class Member
     include StatePattern
     set_initial_state Lynn
-    valid_transitions [James, :name] => Lynn, [Lynn, :name] => James
 
-    #notice this method is optional, it will be delegated automatically if removed
     def name
-      delegate_to_state :name
+      super
     end
 
     def last_name
@@ -37,20 +38,20 @@ end
 Expectations do
   expect "Lynn Holbrook" do
     member = Family::Member.new
-    member.name 
+    member.name
   end
 
   expect "James Holbrook" do
     member = Family::Member.new
-    member.name 
-    member.name 
+    member.name
+    member.name
   end
 
   expect "Lynn Holbrook" do
     member = Family::Member.new
-    member.name 
-    member.name 
-    member.name 
+    member.name
+    member.name
+    member.name
   end
 
   expect true do

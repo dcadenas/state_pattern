@@ -6,7 +6,7 @@ module StatePattern
 
         after_initialize :set_state_from_db
         def set_state_from_db
-          set_state(state_string_as_class)
+          set_state(state_string_as_class || self.class.initial_state_class)
         end
 
         #enable after_initialize callback
@@ -16,7 +16,7 @@ module StatePattern
           def after_initialize; end
         end
 
-        def set_state_with_active_record_attribute(state_class = nil)
+        def set_state_with_active_record_attribute(state_class)
           set_state_without_active_record_attribute(state_class)
           write_attribute(self.class.state_attribute, @current_state_instance.class.name)
         end

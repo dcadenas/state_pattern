@@ -23,17 +23,6 @@ module TestClassCreationHelper
     created_consts << create_class(main_state_module_name) do
       include StatePattern
       set_initial_state Object.const_get(options[:initial_state]) if options.has_key?(:initial_state)
-      if options.has_key?(:valid_transitions)
-        valid_transitions_with_constants = {}
-        options[:valid_transitions].each do |from_module_string_or_array, to_module_string|
-          if from_module_string_or_array.respond_to?(:to_ary)
-            valid_transitions_with_constants[[Object.const_get(from_module_string_or_array.first), from_module_string_or_array.last]] = Object.const_get(to_module_string)
-          else
-            valid_transitions_with_constants[Object.const_get(from_module_string_or_array)] = Object.const_get(to_module_string)
-          end
-        end
-        valid_transitions valid_transitions_with_constants
-      end
     end
 
     begin

@@ -4,15 +4,15 @@ module Hooks
   class On < StatePattern::State
     def press
       transition_to(Off)
-      stateable.messages << "#{stateable.button_name} is off"
+      stateful.messages << "#{stateful.button_name} is off"
     end
 
     def enter
-      stateable.messages << "Entered the On state"
+      stateful.messages << "Entered the On state"
     end
 
     def exit
-      stateable.messages << "Exited the On state"
+      stateful.messages << "Exited the On state"
     end
 
   private 
@@ -23,22 +23,21 @@ module Hooks
   class Off < StatePattern::State
     def press
       transition_to(On)
-      stateable.messages << "#{stateable.button_name} is on"
+      stateful.messages << "#{stateful.button_name} is on"
     end
 
     def enter
-      stateable.messages << "Entered the Off state"
+      stateful.messages << "Entered the Off state"
     end
 
     def exit
-      stateable.messages << "Exited the Off state"
+      stateful.messages << "Exited the Off state"
     end
   end
 
   class Button
     include StatePattern
     set_initial_state Off
-    valid_transitions [On, :press] => Off, [Off, :press] => On
 
     def button_name
       "Button"

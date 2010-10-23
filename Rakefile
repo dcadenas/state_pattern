@@ -21,5 +21,4 @@ rescue LoadError
   end
 end
 
-
 task :default => :test
