@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'rails'
 require 'active_record'
 
 {
@@ -22,5 +21,4 @@ end
 
 ActiveRecord::Base.establish_connection :adapter => :nulldb, :schema => 'schema.rb'
 
-require 'rails/init'
 require 'state_pattern/active_record'

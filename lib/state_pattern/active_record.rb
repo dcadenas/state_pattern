@@ -10,7 +10,7 @@ module StatePattern
         end
 
         #enable after_initialize callback
-        if Rails.version >= "3.0.0"
+        if ::ActiveRecord::VERSION::STRING >= "3.0.0"
           def self.after_initialize; end
         else
           def after_initialize; end
