@@ -1,0 +1,276 @@
+[![Build Status](https://secure.travis-ci.org/dcadenas/state_pattern.png?branch=master)](http://travis-ci.org/dcadenas/state_pattern)
+
+# state_pattern
+
+A Ruby state pattern implementation.
+
+This library intentionally follows the classic state pattern implementation (no mixins, classical delegation to simple state classes, etc.) believing that it increases flexibility (internal DSL constraints vs plain object oriented Ruby power), simplicity and clarity.
+
+The gem is ready for Rails active record integration (see below and the examples folder).
+
+## Usage and functionality summary
+
+* Define the set of states you want your stateful object to have by creating a class for each state and inheriting from `StatePattern:State`.
+* All public methods defined in this state classes, except `enter` and `exit` (see below), are then available to the stateful object and their behaviour will depend on the current state . 
+* If this automatic delegation to the current state public methods is not enough for your stateful object then you can just reopen the method and use super whenever you want to call the state implementation.
+* Inside each state instance you can access the stateful object through the +stateful+ method.
+* Inside each state instance you can access the previous state through the +previous_state+ method.
+* Define `enter` or `exit` methods to hook any behaviour you want to execute whenever the stateful object enters or exits the state.
+* An event is just a method that calls `transition_to` at some point.
+* If you want guards for some event just use plain old ifs before your `transition_to`.
+* In the stateful object you must `set_initial_state`.
+
+## Examples
+
+So here's a simple example that mimics a traffic semaphore
+
+```ruby
+require 'state_pattern'
+
+class Stop < StatePattern::State
+  def next
+    sleep 3
+    transition_to(Go)
+  end
+
+  def color
+    "Red"
+  end
+end
+
+class Go < StatePattern::State
+  def next
+    sleep 2
+    transition_to(Caution)
+  end
+
+  def color
+    "Green"
+  end
+end
+
+class Caution < StatePattern::State
+  def next
+    sleep 1
+    transition_to(Stop)
+  end
+
+  def color
+    "Amber"
+  end
+end
+
+class TrafficSemaphore
+  include StatePattern
+  set_initial_state Stop
+end
+
+semaphore = TrafficSemaphore.new
+
+loop do
+  puts semaphore.color
+  semaphore.next
+end
+```
+
+Let's now use one nice example from the AASM documentation and translate it to state_pattern.
+
+```ruby
+require 'state_pattern'
+
+class Dating < StatePattern::State
+  def get_intimate
+    transition_to(Intimate) if stateful.drunk?
+  end
+
+  def get_married
+    transition_to(Married) if stateful.willing_to_give_up_manhood?
+  end
+
+  def enter
+    stateful.make_happy
+  end
+
+  def exit
+    stateful.make_depressed
+  end
+end
+
+class Intimate < StatePattern::State
+  def get_married
+    transition_to(Married) if stateful.willing_to_give_up_manhood?
+  end
+
+  def enter
+    stateful.make_very_happy
+  end
+
+  def exit
+    stateful.never_speak_again
+  end
+end
+
+class Married < StatePattern::State
+  def enter
+    stateful.give_up_intimacy
+  end
+
+  def exit
+    stateful.buy_exotic_car_and_wear_a_combover
+  end
+end
+
+class Relationship
+  include StatePattern
+  set_initial_state Dating
+
+  def drunk?; @drunk; end
+  def willing_to_give_up_manhood?; @give_up_manhood; end
+  def make_happy; end
+  def make_depressed; end
+  def make_very_happy; end
+  def never_speak_again; end
+  def give_up_intimacy; end
+  def buy_exotic_car_and_wear_a_combover; end
+end
+```
+
+## Enter and exit hooks
+
+Inside your state classes, any code that you put inside the enter method will be executed when the state is instantiated.
+You can also use the exit hook which is triggered when a successful transition to another state takes place.
+
+## Overriding automatic delegation
+
+If the automatic delegation to the current state public methods is not enough for your stateful object then you can just reopen the method and use super whenever you want to call the state implementation.
+
+```ruby
+class TrafficSemaphore
+  include StatePattern
+  set_initial_state Stop
+
+  def color
+    # some great code here
+    # now we call the current state implementation
+    super 
+    # more cool hacking here
+  end
+end
+```
+
+## Rails
+
+To use the state pattern in your Rails models you need to:
+
+* Add a state column for your model table of type string
+* Include StatePattern::ActiveRecord in your model file
+* Use the state pattern as you would do in a plain Ruby class as shown above
+
+Please see the examples folder for a Rails 3 example.
+
+### Example
+
+Remember to put each class in its correct file following Rails naming conventions.
+
+```ruby
+module BlogStates
+  #we can put common state behaviour into a base state class or we could have implemented it inside the model with methods that call super, your choice
+  class StateBase < StatePattern::State
+    def submit!
+    end
+
+    def publish!
+    end
+
+    def reject!
+      transition_to(Rejected)
+      stateful.save!
+    end
+
+    def verify!
+    end
+  end
+
+  class Published < StateBase
+  end
+
+  class Pending < StateBase
+    def publish!
+      transition_to(Published) if stateful.valid?
+      stateful.save!
+    end
+  end
+
+  class Unverified < StateBase
+    def submit!
+      if stateful.submitter.manager?
+        if stateful.profile_complete?
+          transition_to(Published)
+        else
+          transition_to(Pending)
+        end
+
+        stateful.save!
+      end
+    end
+
+    def verify!
+      transition_to(Pending)
+      stateful.save!
+    end
+  end
+
+  class Rejected < StateBase
+    def publish!
+      transition_to(Published) if stateful.valid?
+      stateful.save!
+    end
+
+    def enter
+      Notifier.notify_blog_owner(stateful)
+    end
+  end
+end
+
+class Blog < ActiveRecord::Base
+  include StatePattern::ActiveRecord
+  set_initial_state Unverified
+
+   .
+   .
+   .
+
+end
+```
+
+### The state attribute
+
+By default `StatePattern::ActiveRecord` expects a column named `state` in the model. If you prefer to use another attribute do:
+
+```ruby
+set_state_attribute :state_column
+```
+
+### How do I decide? state_pattern or [AASM](http://github.com/rubyist/aasm)?
+
+* Lot of state dependent behavior? Lot of conditional logic depending on the state? => state_pattern
+* Not much state dependent behavior? => AASM
+
+## Thanks
+
+* [Alvaro Gil](http://github.com/zevarito) for being the first using this gem in a real Rails project.
+* [Nicolás Sanguinetti](http://github.com/foca) for his great feedback.
+
+## Installation
+
+```bash
+gem install state_pattern
+```
+
+## Collaborate
+
+[http://github.com/dcadenas/state_pattern](http://github.com/dcadenas/state_pattern)
+
+## Copyright
+
+Copyright (c) 2009 Daniel Cadenas. See LICENSE for details.
