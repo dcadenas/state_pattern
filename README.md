@@ -73,7 +73,7 @@ loop do
 end
 ```
 
-Let's now use one nice example from the AASM documentation and translate it to state_pattern.
+Let's now use one nice example from the [AASM](http://github.com/rubyist/aasm) documentation and translate it to state_pattern.
 
 ```ruby
 require 'state_pattern'
@@ -163,7 +163,7 @@ end
 To use the state pattern in your Rails models you need to:
 
 * Add a state column for your model table of type string
-* Include StatePattern::ActiveRecord in your model file
+* Include `StatePattern::ActiveRecord` in your model file
 * Use the state pattern as you would do in a plain Ruby class as shown above
 
 Please see the examples folder for a Rails 3 example.
@@ -254,7 +254,7 @@ set_state_attribute :state_column
 ### How do I decide? state_pattern or [AASM](http://github.com/rubyist/aasm)?
 
 * Lot of state dependent behavior? Lot of conditional logic depending on the state? => state_pattern
-* Not much state dependent behavior? => AASM
+* Not much state dependent behavior? => [AASM](http://github.com/rubyist/aasm)
 
 ## Thanks
 
@@ -273,4 +273,4 @@ gem install state_pattern
 
 ## Copyright
 
-Copyright (c) 2009 Daniel Cadenas. See LICENSE for details.
+Copyright (c) 2009 Daniel Cadenas. See [LICENSE](https://raw.github.com/dcadenas/state_pattern/master/LICENSE) for details.
