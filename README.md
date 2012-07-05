@@ -1,5 +1,5 @@
 [![Build Status](https://secure.travis-ci.org/dcadenas/state_pattern.png?branch=master)](http://travis-ci.org/dcadenas/state_pattern)
-
+[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/dcadenas/state_pattern)
 [![endorse](http://api.coderwall.com/dcadenas/endorsecount.png)](http://coderwall.com/dcadenas)
 
 # state_pattern
