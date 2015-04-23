@@ -26,7 +26,7 @@ module StatePattern
           set_state(state_string_as_class(new_state_string))
         end
 
-        def state_string_as_class(state_string = @attributes[self.class.state_attribute])
+        def state_string_as_class(state_string = read_attribute(self.class.state_attribute))
           state_string.camelize.constantize unless state_string.nil?
         end
 

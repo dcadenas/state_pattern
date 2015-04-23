@@ -1,8 +1,6 @@
 language: ruby
 rvm:
-  - 1.9.3
-  - rbx-19mode
-  - jruby-19mode
+  - 2.2.0
 gemfile:
+  - gemfiles/Gemfile-rails.4.x
   - gemfiles/Gemfile-rails.3.x
-  - gemfiles/Gemfile-rails.2.x

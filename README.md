@@ -269,6 +269,8 @@ set_state_attribute :state_column
 gem install state_pattern
 ```
 
+To run the tests `bundle` and then `bundle exec rake`
+
 ## Collaborate
 
 [http://github.com/dcadenas/state_pattern](http://github.com/dcadenas/state_pattern)

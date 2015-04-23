@@ -1,3 +1,4 @@
+require 'minitest/autorun'
 require 'minitest/unit'
 require 'expectations'
 require 'state_pattern'

@@ -1,4 +1,5 @@
 require 'state_pattern/active_record/test_helper'
+require 'nulldb/rails'
 
 class ARButton < ActiveRecord::Base
   class On < StatePattern::State
