@@ -3,4 +3,3 @@ rvm:
   - 2.2.0
 gemfile:
   - gemfiles/Gemfile-rails.4.x
-  - gemfiles/Gemfile-rails.3.x
