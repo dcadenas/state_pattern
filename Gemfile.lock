@@ -8,39 +8,36 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (4.2.1)
-      activesupport (= 4.2.1)
-      builder (~> 3.1)
-    activerecord (4.2.1)
-      activemodel (= 4.2.1)
-      activesupport (= 4.2.1)
-      arel (~> 6.0)
-    activesupport (4.2.1)
-      i18n (~> 0.7)
-      json (~> 1.7, >= 1.7.7)
-      minitest (~> 5.1)
-      thread_safe (~> 0.3, >= 0.3.4)
-      tzinfo (~> 1.1)
-    arel (6.0.0)
-    builder (3.2.2)
+    activemodel (6.1.7.1)
+      activesupport (= 6.1.7.1)
+    activerecord (6.1.7.1)
+      activemodel (= 6.1.7.1)
+      activesupport (= 6.1.7.1)
+    activesupport (6.1.7.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+      zeitwerk (~> 2.3)
+    concurrent-ruby (1.1.10)
     expectations (2.0.0)
       mocha (>= 0.5.5)
-    i18n (0.7.0)
-    json (1.8.2)
+    i18n (1.12.0)
+      concurrent-ruby (~> 1.0)
     metaclass (0.0.4)
     minitest (5.6.0)
     mocha (1.1.0)
       metaclass (~> 0.0.1)
     rake (10.3.2)
-    thread_safe (0.3.5)
-    tzinfo (1.2.2)
-      thread_safe (~> 0.1)
+    tzinfo (2.0.5)
+      concurrent-ruby (~> 1.0)
+    zeitwerk (2.6.6)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord (~> 4)
+  activerecord (~> 6)
   activerecord-nulldb-adapter!
   expectations
   minitest
